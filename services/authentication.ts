@@ -1,25 +1,34 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { http } from '../libs/ky';
 import { SignInFormSchema } from '../modules/authentication/types/sign-in';
 import { SignUpFormSchema } from '../modules/authentication/types/sign-up';
 import useAuthStore from '../store/auth/auth';
 import Toast from 'react-native-toast-message';
 import { router } from 'expo-router';
+import {
+  getAccessToken,
+  setAccessToken,
+  getRefreshToken,
+  setRefreshToken,
+  clearTokens as clearTokenManager,
+} from '../store/token/token-manager';
 
 interface LoginResponse {
   access_token: string;
+  refresh_token: string;
 }
 
-// Helper function to set the token in Zustand and AsyncStorage
-async function setToken(token: string) {
-  useAuthStore.getState().setToken(token);
-  await AsyncStorage.setItem('token', token);
+// Helper function to set both access and refresh tokens in Zustand and AsyncStorage via token-manager
+async function setTokens(accessToken: string, refreshToken: string) {
+  await setAccessToken(accessToken); // Use token-manager for persistence
+  await setRefreshToken(refreshToken);
+  useAuthStore.getState().setAccessToken(accessToken); // Set in Zustand
+  useAuthStore.getState().setRefreshToken(refreshToken);
 }
 
-// Helper function to clear the token from Zustand and AsyncStorage
-async function clearToken() {
-  useAuthStore.getState().clearToken();
-  await AsyncStorage.removeItem('token');
+// Helper function to clear both access and refresh tokens via token-manager
+async function clearTokens() {
+  await clearTokenManager(); // Use token-manager for clearing tokens
+  useAuthStore.getState().clearTokens();
 }
 
 // Login function
@@ -32,13 +41,13 @@ async function loginUser({ email, password }: SignInFormSchema) {
       .json();
 
     if (response) {
-      await setToken(response.access_token); // Set token after successful sign-up
+      await setTokens(response.access_token, response.refresh_token); // Set both tokens after successful login
 
       Toast.show({
         type: 'success',
         props: {
           title: 'Success',
-          description: 'You have login successfully',
+          description: 'You have logged in successfully',
         },
       });
 
@@ -57,7 +66,7 @@ async function loginUser({ email, password }: SignInFormSchema) {
 
 // Fetch protected data
 async function getProtectedData() {
-  const token = useAuthStore.getState().token;
+  const token = await getAccessToken(); // Get the access token from token-manager
 
   if (!token) {
     throw new Error('User is not authenticated. No token available.');
@@ -84,20 +93,18 @@ async function signUpUser({ username, email, password }: SignUpFormSchema) {
       .json();
 
     if (response) {
-      await setToken(response.access_token); // Set token after successful sign-up
+      await setTokens(response.access_token, response.refresh_token); // Set both tokens after successful signup
 
       Toast.show({
         type: 'success',
         props: {
           title: 'Success',
-          description: 'You have registerd successfully',
+          description: 'You have registered successfully',
         },
       });
 
       router.replace('/home');
     }
-
-    // Adding a Toast here to should that user is in.
   } catch (error) {
     Toast.show({
       type: 'error',
@@ -112,16 +119,17 @@ async function signUpUser({ username, email, password }: SignUpFormSchema) {
 // Logout function
 async function logOutUser() {
   try {
-    await clearToken(); // Clear token from Zustand and AsyncStorage
+    await clearTokens(); // Clear both access and refresh tokens via token-manager
 
-    const tokenInStorage = await AsyncStorage.getItem('token');
+    const accessTokenInStorage = await getAccessToken();
+    const refreshTokenInStorage = await getRefreshToken();
 
-    if (tokenInStorage === null) {
+    if (accessTokenInStorage === null && refreshTokenInStorage === null) {
       Toast.show({
         type: 'success',
         props: {
           title: 'Success',
-          description: 'Successfully logout',
+          description: 'Successfully logged out',
         },
       });
       router.replace('/login');

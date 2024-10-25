@@ -9,6 +9,8 @@ import { THEME } from '../../constants/theme';
 import SectionContainer from '../../components/wrapper/container';
 import { Button, Text } from '../../components/shared';
 import Toast from 'react-native-toast-message';
+import { StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 
 const OnBordingLayout = () => {
   const width = useSharedValue<number>(0);
@@ -25,17 +27,18 @@ const OnBordingLayout = () => {
   }, []);
 
   const onClick = () => {
+    router.push('/login');
     Toast.show({
-      type: 'error',
+      type: 'success',
       props: {
         title: 'Success',
-        description: 'Product deleted successfully',
+        description: 'Pushed to Login page',
       },
     });
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
       <SectionContainer
         containerStyle={{
           marginHorizontal: 20,
@@ -75,3 +78,10 @@ const OnBordingLayout = () => {
 };
 
 export default OnBordingLayout;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+});

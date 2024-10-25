@@ -1,6 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "module": "esnext", // or 'es2020', 'commonjs', etc.
+    "target": "esnext", // Optional, but can help with newer JS features
+    "moduleResolution": "node" // To resolve modules in node-like fashion
+    // ...other options
   }
 }

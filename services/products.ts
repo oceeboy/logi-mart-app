@@ -1,6 +1,6 @@
 import { http } from '../libs/ky';
 
-interface ProductDataProps {
+export interface ProductDataProps {
   id: string;
   name: string;
   price: number;

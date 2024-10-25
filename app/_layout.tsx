@@ -38,15 +38,24 @@ const RootLayout = () => {
 };
 
 function Root() {
-  const { status } = useAuthStore();
+  const { status, rehydrateAuthState } = useAuthStore();
   // rember to change the state for the status to autnenticated bellow
+
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.replace('/home');
-    } else if (status === 'authenticated') {
-      router.replace('/login');
-    }
+    const initializeAuthState = async () => {
+      await rehydrateAuthState(); // Rehydrate tokens from AsyncStorage when app starts
+
+      // Navigate based on authentication state
+      if (status === 'authenticated') {
+        router.replace('/home'); // Navigate to home if authenticated
+      } else {
+        router.replace('/onboarding'); // Navigate to onboarding if not authenticated
+      }
+    };
+
+    initializeAuthState();
   }, [status]);
+
   return (
     <>
       <Stack
