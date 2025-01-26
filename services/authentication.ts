@@ -54,13 +54,18 @@ async function loginUser({ email, password }: SignInFormSchema) {
       router.replace('/home');
     }
   } catch (error: unknown) {
-    Toast.show({
-      type: 'error',
-      props: {
-        title: 'Error',
-        description: `${error}`,
-      },
-    });
+    // need to check this code for later as the user gets only error status,, seems it the ky.ts http issues dependence
+    if (error.response?.status === 401) {
+      const errorMessage = await error.response.json();
+
+      Toast.show({
+        type: 'error',
+        props: {
+          title: `${errorMessage.error}`,
+          description: `${errorMessage.message} `,
+        },
+      });
+    }
   }
 }
 
@@ -106,13 +111,16 @@ async function signUpUser({ username, email, password }: SignUpFormSchema) {
       router.replace('/home');
     }
   } catch (error) {
-    Toast.show({
-      type: 'error',
-      props: {
-        title: 'Error',
-        description: `${error}`,
-      },
-    });
+    if (error.response?.status === 400) {
+      const errorMessageData = await error.response.json();
+      Toast.show({
+        type: 'error',
+        props: {
+          title: `${errorMessageData.error}`,
+          description: `${errorMessageData.message}`,
+        },
+      });
+    }
   }
 }
 

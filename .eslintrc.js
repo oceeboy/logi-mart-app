@@ -10,7 +10,7 @@ module.exports = {
   ],
   rules: {
     'prettier/prettier': 'error',
-    'no-console': 'warn',
+    //'no-console': 'warn',
     '@typescript-eslint/no-unused-vars': 'error',
   },
   settings: {

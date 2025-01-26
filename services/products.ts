@@ -1,16 +1,17 @@
 import { http } from '../libs/ky';
 
-export interface ProductDataProps {
+export type ProductDataProps = {
   id: string;
   name: string;
   price: number;
   description: string;
   image: string;
   createdAt: Date;
-}
+};
 
+// check improvement during test
 async function getAllProduct() {
-  const data: ProductDataProps = await http.get('product').json();
+  const data: Response = await http.get('product').json();
   return data;
 }
 

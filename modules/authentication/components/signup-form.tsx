@@ -33,7 +33,7 @@ const SignUpForm = () => {
         control={control}
         label="Username"
         placeholder="Enter a Username"
-        errorMessage={errors.email?.message} // Display error if validation fails
+        errorMessage={errors.username?.message} // Display error if validation fails
       />
       <FormField
         name="email"
