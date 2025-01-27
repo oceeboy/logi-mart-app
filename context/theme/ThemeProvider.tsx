@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
+import Toast from 'react-native-toast-message';
 
 interface Colors {
   background: string;
@@ -54,8 +55,14 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         if (storedTheme) {
           setTheme(storedTheme === 'dark' ? darkTheme : lightTheme);
         }
-      } catch (error: unknown) {
-        console.error(error);
+      } catch {
+        Toast.show({
+          type: 'error',
+          props: {
+            title: 'Error Theme',
+            description: 'Error changing theme',
+          },
+        });
       }
     };
 
