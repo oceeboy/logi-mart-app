@@ -26,7 +26,11 @@ jobs:
 
       # Install dependencies with a clean environment
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
+
+      # Ensure Expo CLI is installed
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
 
       # Run ESLint and fail the job if issues are found
       - name: Run ESLint
